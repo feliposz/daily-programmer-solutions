@@ -1,0 +1,86 @@
+<!doctype html>
+<html ng-app="convApp" ng-controller="ConversionController">
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.min.js"></script>
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="jumbotron">
+        <div class="container">
+            <h1>Reddit Easy Challenge #2</h1>
+            <p>Hello, coders! An important part of programming is being able to
+            apply your programs, so your challenge for today is to create a
+            calculator application that has use in your life. It might be an
+            interest calculator, or it might be something that you can use in the
+            classroom. For example, if you were in physics class, you might want to
+            make a F = M * A calc. EXTRA CREDIT: make the calculator have multiple
+            functions! Not only should it be able to calculate F = M * A, but also A
+            = F/M, and M = F/A!</p>
+
+            <a class="btn btn-primary btn-lg"
+               href="http://www.reddit.com/r/dailyprogrammer/comments/pjbj8/easy_challenge_2/"
+               target="_new"><i class="glyphicon glyphicon-link"></i> Go to the challenge post</a>
+        </div>
+    </div>
+        
+    <div class="container">
+        <form class="form-horizontal" name="myForm" method="post" >
+            <div class="form-group">
+                <label for="conversion" class="col-sm-2 control-label">Conversion</label>
+                <div class="col-sm-8">
+                    <select class="form-control" id="conversion" ng-model="conversion">
+                        <option ng-repeat="r in resources" value="{{ r.resource.fields.price }}">
+                            {{ r.resource.fields.name }}
+                        </option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="value" class="col-sm-2 control-label">Value</label>
+                <div class="col-sm-8">
+                    <input type="text" class="form-control" id="value" ng-model="value" placeholder="Value to convert from"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="rate" class="col-sm-2 control-label">Conversion rate</label>
+                <div class="col-sm-8">
+                    <input type="text" class="form-control" id="rate" readonly value="{{ conversion }}" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="result" class="col-sm-2 control-label">Result</label>
+                <div class="col-sm-8">
+                    <input type="text" class="form-control" id="result" readonly 
+                           value="{{ value && conversion ? (reverse ? value/conversion : value*conversion) : 'Please, select a conversion and input a value' }}"  />
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-8">
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" id="reverse" ng-model="reverse" />Reverse
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <script type="text/javascript">
+        var nameApp = angular.module('convApp', []);
+
+        nameApp.controller('ConversionController', function($scope, $http) {
+            var url = 'https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20json%20where%20url%3D%22http%3A%2F%2Ffinance.yahoo.com%2Fwebservice%2Fv1%2Fsymbols%2Fallcurrencies%2Fquote%3Fformat%3Djson%22&format=json&diagnostics=true&callback=JSON_CALLBACK';
+            console.log('url = ' + url);
+            $http.jsonp(url).success(function(response) {
+                console.log('Success!');
+                $scope.resources = response.query.results.list.resources.sort(function (a, b) {
+                    return a.resource.fields.name.localeCompare(b.resource.fields.name);
+                });
+                console.dir(response);
+            });
+        });
+    </script>
+</body>
+</html>
+
